@@ -11,11 +11,11 @@ export const counterSlice = createSlice({
   initialState,
   reducers: {
     addCounter: (state, action) => {
-      state.counters = [...state.counters, action.payload];
+      state.counters = [...state.counters, action.payload.id];
     },
     removeCounter: (state, action) => {
       state.counters = state.counters.filter(
-        (counter) => counter !== action.payload
+        (counter) => counter !== action.payload.id
       );
     },
     increment: (state) => {

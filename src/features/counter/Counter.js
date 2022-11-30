@@ -8,7 +8,7 @@ const Counter = ({ id }) => {
   const dispatch = useDispatch();
 
   const onRemove = () => {
-    dispatch(removeCounter(id));
+    dispatch(removeCounter({ id }));
   };
 
   return (

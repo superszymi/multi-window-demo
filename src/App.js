@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import Counter from "./features/counter/Counter";
 import "./App.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +9,7 @@ import {
   selectCounters,
   selectFirstFreeId,
 } from "./features/counter/counterSlice";
+import { createAction } from "@reduxjs/toolkit";
 
 function App() {
   const counters = useSelector(selectCounters);
@@ -16,7 +17,7 @@ function App() {
   const dispatch = useDispatch();
 
   const onAddCounterClick = useCallback(() => {
-    dispatch(addCounter(nextId));
+    dispatch(addCounter({ id: nextId }));
   }, [dispatch, nextId]);
 
   const onOpenNewTabClick = () => {
@@ -26,6 +27,18 @@ function App() {
       "popup=true,noreferrer=true,left=1280,width=1280"
     );
   };
+
+  useEffect(() => {
+    const bc = new BroadcastChannel("state-sync");
+    bc.addEventListener("message", (message) => {
+      const { type, payload } = message.data;
+      if (payload && payload.synced === true) {
+        return;
+      }
+      dispatch(createAction(type)({ ...payload, synced: true }));
+    });
+    return () => bc.close();
+  }, [dispatch]);
 
   return (
     <div className="App">

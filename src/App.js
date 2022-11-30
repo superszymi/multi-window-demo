@@ -15,16 +15,25 @@ function App() {
   const nextId = useSelector(selectFirstFreeId);
   const dispatch = useDispatch();
 
-  const onAddCounter = useCallback(() => {
+  const onAddCounterClick = useCallback(() => {
     dispatch(addCounter(nextId));
   }, [dispatch, nextId]);
+
+  const onOpenNewTabClick = () => {
+    window.open(
+      window.location.href,
+      "",
+      "popup=true,noreferrer=true,left=1280,width=1280"
+    );
+  };
 
   return (
     <div className="App">
       <header className="App-header">
         <button onClick={() => dispatch(decrement())}>-</button>
-        <button onClick={onAddCounter}>Add counter</button>
+        <button onClick={onAddCounterClick}>Add counter</button>
         <button onClick={() => dispatch(increment())}>+</button>
+        <button onClick={onOpenNewTabClick}>Open new tab</button>
       </header>
       <main className="App-main">
         {counters.map((id) => (

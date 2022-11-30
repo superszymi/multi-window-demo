@@ -1,8 +1,12 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  counters: [1],
-  count: 0,
+  counters: { 1: 0 },
+  tabs: {
+    single: ["1"],
+    one: [],
+    two: [],
+  },
 };
 
 export const counterSlice = createSlice({
@@ -10,36 +14,85 @@ export const counterSlice = createSlice({
   initialState,
   reducers: {
     addCounter: (state, action) => {
-      state.counters = [...state.counters, action.payload.id];
+      state.counters = { ...state.counters, [action.payload.id]: 0 };
+      state.tabs = {
+        ...state.tabs,
+        single: [...state.tabs.single, action.payload.id.toString()],
+        [action.payload.tab]: [
+          ...state.tabs[action.payload.tab],
+          action.payload.id.toString(),
+        ],
+      };
     },
     removeCounter: (state, action) => {
-      state.counters = state.counters.filter(
-        (counter) => counter !== action.payload.id
+      state.counters = Object.keys(state.counters)
+        .filter((counter) => counter !== action.payload.id)
+        .reduce((obj, cur) => ({ ...obj, [cur]: state.counters[cur] }), {});
+      state.tabs = {
+        ...state.tabs,
+        single: state.tabs.single.filter((id) => id !== action.payload.id),
+        [action.payload.tab]: state.tabs[action.payload.tab].filter(
+          (id) => id !== action.payload.id
+        ),
+      };
+    },
+    increment: (state, action) => {
+      state.counters = {
+        ...state.counters,
+        [action.payload.id]: state.counters[action.payload.id] + 1,
+      };
+    },
+    decrement: (state, action) => {
+      state.counters = {
+        ...state.counters,
+        [action.payload.id]: state.counters[action.payload.id] - 1,
+      };
+    },
+    incrementAll: (state) => {
+      state.counters = Object.keys(state.counters).reduce(
+        (obj, cur) => ({ ...obj, [cur]: state.counters[cur] + 1 }),
+        {}
       );
     },
-    increment: (state) => {
-      state.count += 1;
+    decrementAll: (state) => {
+      state.counters = Object.keys(state.counters).reduce(
+        (obj, cur) => ({ ...obj, [cur]: state.counters[cur] - 1 }),
+        {}
+      );
     },
-    decrement: (state) => {
-      state.count -= 1;
+    spreadCounters: (state) => {
+      state.tabs = {
+        single: state.tabs.single,
+        one: state.tabs.single.filter((id) => id % 2 !== 0),
+        two: state.tabs.single.filter((id) => id % 2 === 0),
+      };
     },
     setInitState: (state, action) => {
-      const { counters, count } = action.payload.state;
-      state.counters = counters;
-      state.count = count;
+      state.counters = action.payload.state.counters;
+      state.tabs = action.payload.state.tabs;
     },
   },
 });
 
-export const { addCounter, removeCounter, increment, decrement, setInitState } =
-  counterSlice.actions;
-
-export const selectCount = (state) => state.counter.count;
+export const {
+  addCounter,
+  removeCounter,
+  increment,
+  decrement,
+  incrementAll,
+  decrementAll,
+  spreadCounters,
+  setInitState,
+} = counterSlice.actions;
 
 export const selectCounters = (state) => state.counter.counters;
 
+export const selectTabs = (state) => state.counter.tabs;
+
 export const selectFirstFreeId = createSelector(selectCounters, (counters) =>
-  counters.length === 0 ? 1 : Math.max(...counters) + 1
+  Object.keys(counters).length === 0
+    ? 1
+    : Math.max(...Object.keys(counters)) + 1
 );
 
 export default counterSlice.reducer;

@@ -3,7 +3,7 @@
   display: grid;
   grid-template-rows: 48px auto;
   grid-template-columns: repeat(6, 1fr);
-  grid-template-areas: "remove-btn title title title title ." ". increment count count decrement .";
+  grid-template-areas: "remove-btn title title title title ." ". decrement count count increment .";
   height: 30vh;
   width: 90%;
   border: 3px solid rgba(112, 76, 182, 0.4);
@@ -24,11 +24,22 @@
 }
 
 .increment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   grid-area: increment;
 }
 
 .decrement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   grid-area: decrement;
+}
+
+.increment > button,
+.decrement > button {
+  height: 48px;
 }
 
 .value {

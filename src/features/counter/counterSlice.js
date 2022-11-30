@@ -2,7 +2,6 @@ import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   counters: [1],
-  status: "idle",
   count: 0,
 };
 
@@ -24,10 +23,15 @@ export const counterSlice = createSlice({
     decrement: (state) => {
       state.count -= 1;
     },
+    setInitState: (state, action) => {
+      const { counters, count } = action.payload.state;
+      state.counters = counters;
+      state.count = count;
+    },
   },
 });
 
-export const { addCounter, removeCounter, increment, decrement } =
+export const { addCounter, removeCounter, increment, decrement, setInitState } =
   counterSlice.actions;
 
 export const selectCount = (state) => state.counter.count;

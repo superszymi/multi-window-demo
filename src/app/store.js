@@ -2,8 +2,11 @@ import { configureStore } from "@reduxjs/toolkit";
 import counterReducer from "../features/counter/counterSlice";
 
 const syncMiddleware = (store) => (next) => (action) => {
-  const { payload } = action;
-  if (payload && payload.synced === true) {
+  const { type, payload } = action;
+  if (
+    (payload && payload.synced === true) ||
+    type === "counters/setInitState"
+  ) {
     return next(action);
   }
   const bc = new BroadcastChannel("state-sync");

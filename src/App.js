@@ -8,8 +8,10 @@ import {
   addCounter,
   selectCounters,
   selectFirstFreeId,
+  setInitState,
 } from "./features/counter/counterSlice";
 import { createAction } from "@reduxjs/toolkit";
+import { store } from "./app/store";
 
 function App() {
   const counters = useSelector(selectCounters);
@@ -28,10 +30,29 @@ function App() {
     );
   };
 
+  const REQUEST_INIT_STATE = "request-init-state";
+  const SEND_INIT_STATE = "send-init-state";
+
+  useEffect(() => {
+    const bc = new BroadcastChannel("state-sync");
+    bc.postMessage({ type: REQUEST_INIT_STATE });
+    return () => bc.close();
+  }, []);
+
   useEffect(() => {
     const bc = new BroadcastChannel("state-sync");
     bc.addEventListener("message", (message) => {
       const { type, payload } = message.data;
+
+      if (type === REQUEST_INIT_STATE) {
+        bc.postMessage({ type: SEND_INIT_STATE, payload: store.getState() });
+        return;
+      }
+      if (type === SEND_INIT_STATE) {
+        dispatch(setInitState({ state: payload.counter }));
+        return;
+      }
+
       if (payload && payload.synced === true) {
         return;
       }

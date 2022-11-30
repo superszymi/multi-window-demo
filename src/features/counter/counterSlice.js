@@ -67,6 +67,18 @@ export const counterSlice = createSlice({
         two: state.tabs.single.filter((id) => id % 2 === 0),
       };
     },
+    moveToTab: (state, action) => {
+      state.tabs = {
+        single: state.tabs.single,
+        [action.payload.sourceTab]: state.tabs[action.payload.sourceTab].filter(
+          (id) => id !== action.payload.id
+        ),
+        [action.payload.targetTab]: [
+          ...state.tabs[action.payload.targetTab],
+          action.payload.id,
+        ],
+      };
+    },
     setInitState: (state, action) => {
       state.counters = action.payload.state.counters;
       state.tabs = action.payload.state.tabs;
@@ -82,6 +94,7 @@ export const {
   incrementAll,
   decrementAll,
   spreadCounters,
+  moveToTab,
   setInitState,
 } = counterSlice.actions;
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Counter from "./features/counter/Counter";
 import "./App.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +11,7 @@ import {
   setInitState,
   selectTabs,
   spreadCounters,
+  moveToTab,
 } from "./features/counter/counterSlice";
 import { createAction } from "@reduxjs/toolkit";
 import { store } from "./app/store";
@@ -23,6 +24,9 @@ function App() {
   const [tab, setTab] = useState(
     new URLSearchParams(window.location.search).get("tab") || "single"
   );
+  const [itemOverDropzone, setItemOverDropzone] = useState(false);
+
+  const ref = useRef(null);
 
   const onAddCounterClick = useCallback(() => {
     dispatch(addCounter({ id: nextId, tab }));
@@ -88,6 +92,51 @@ function App() {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, []);
 
+  const onCounterDrop = useCallback(
+    (event) => {
+      event.preventDefault();
+      setItemOverDropzone(false);
+      if (!tab || tab === "single") {
+        return;
+      }
+      const id = event.dataTransfer.getData("text/plain");
+      if (!tabs[tab].includes(id)) {
+        dispatch(
+          moveToTab({
+            id,
+            targetTab: tab,
+            sourceTab: tab === "one" ? "two" : "one",
+          })
+        );
+      }
+    },
+    [dispatch, tab, tabs]
+  );
+
+  const onDragOver = (event) => {
+    event.preventDefault();
+  };
+  const onDragEnter = () => {
+    setItemOverDropzone(true);
+  };
+  const onDragLeave = () => {
+    setItemOverDropzone(false);
+  };
+
+  useEffect(() => {
+    const dropzone = ref.current;
+    dropzone.addEventListener("drop", (event) => onCounterDrop(event));
+    dropzone.addEventListener("dragover", (event) => onDragOver(event));
+    dropzone.addEventListener("dragenter", () => onDragEnter());
+    dropzone.addEventListener("dragleave", () => onDragLeave());
+    return () => {
+      dropzone.removeEventListener("drop", onCounterDrop);
+      dropzone.removeEventListener("dragover", onDragOver);
+      dropzone.removeEventListener("dragenter", onDragEnter);
+      dropzone.removeEventListener("dragleave", onDragLeave);
+    };
+  }, [dispatch, onCounterDrop, tab, tabs]);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -96,10 +145,16 @@ function App() {
         <button onClick={() => dispatch(incrementAll())}>+</button>
         <button onClick={onOpenNewTabClick}>Open new tab</button>
       </header>
-      <main className="App-main">
+      <main
+        className={`App-main ${itemOverDropzone ? "dragover" : ""}`}
+        ref={ref}
+      >
         {Object.entries(counters).map(
           ([id, value]) =>
             tabs[tab].includes(id) && <Counter key={id} id={id} value={value} />
+        )}
+        {itemOverDropzone && (
+          <div className="dragover-text">Drop counter here</div>
         )}
       </main>
     </div>

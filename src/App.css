@@ -23,11 +23,29 @@
 }
 
 .App-main {
+  position: relative;
   margin-top: 200px;
   height: calc(100% - 240px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   row-gap: 10px;
+  border: none;
+  border-radius: 20px;
+  transition: border ease 0.3s;
+}
+
+.App-main.dragover {
+  border: 4px solid rgba(183, 160, 228, 0.4);
+}
+
+.dragover-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  pointer-events: none;
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 button {

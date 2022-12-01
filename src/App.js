@@ -37,7 +37,7 @@ function App() {
     window.open(
       window.location.href + "?tab=two",
       "",
-      "popup=true,noreferrer=true,left=1280,width=1280,address=yes"
+      "popup=true,noopener,left=1280,width=1280,address=yes"
     );
     setTab("one");
     window.history.pushState({}, "", window.location.href + "?tab=one");

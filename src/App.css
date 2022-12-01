@@ -2,12 +2,15 @@
   box-sizing: border-box;
 }
 
+body {
+  color: white;
+  background-color: rgb(41, 40, 48);
+}
+
 .App {
-  height: 100vh;
+  height: 100%;
   text-align: center;
   padding: 20px 40px;
-  background-color: rgb(41, 40, 48);
-  color: white;
 }
 
 .App-header {

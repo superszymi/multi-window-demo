@@ -9,9 +9,9 @@ import {
   selectCounters,
   selectFirstFreeId,
   setInitState,
-  selectTabs,
+  selectWindows,
   spreadCounters,
-  moveToTab,
+  moveToWindow,
 } from "./features/counter/counterSlice";
 import { createAction } from "@reduxjs/toolkit";
 import { store } from "./app/store";
@@ -20,27 +20,27 @@ function App() {
   const counters = useSelector(selectCounters);
   const nextId = useSelector(selectFirstFreeId);
   const dispatch = useDispatch();
-  const tabs = useSelector(selectTabs);
-  const [tab, setTab] = useState(
-    new URLSearchParams(window.location.search).get("tab") || "single"
+  const windows = useSelector(selectWindows);
+  const [currentWindow, setCurrentWindow] = useState(
+    new URLSearchParams(window.location.search).get("window") || "single"
   );
   const [itemOverDropzone, setItemOverDropzone] = useState(false);
 
   const ref = useRef(null);
 
   const onAddCounterClick = useCallback(() => {
-    dispatch(addCounter({ id: nextId, tab }));
-  }, [dispatch, nextId, tab]);
+    dispatch(addCounter({ id: nextId, window: currentWindow }));
+  }, [dispatch, nextId, currentWindow]);
 
-  const onOpenNewTabClick = () => {
+  const onOpenNewWindowClick = () => {
     dispatch(spreadCounters());
     window.open(
-      window.location.href + "?tab=two",
+      window.location.href + "?window=two",
       "",
-      "popup=true,noopener,left=1280,width=1280,address=yes"
+      "popup=true,noopener,left=720,width=720,address=yes"
     );
-    setTab("one");
-    window.history.pushState({}, "", window.location.href + "?tab=one");
+    setCurrentWindow("one");
+    window.history.pushState({}, "", window.location.href + "?window=one");
   };
 
   const REQUEST_INIT_STATE = "request-init-state";
@@ -65,13 +65,13 @@ function App() {
         dispatch(setInitState({ state: payload.counter }));
         return;
       }
-      if (type === EXIT_MULTI_TAB) {
+      if (type === EXIT_MULTI_WINDOW) {
         window.history.pushState(
           {},
           "",
           window.location.origin + window.location.pathname
         );
-        setTab("single");
+        setCurrentWindow("single");
       }
 
       if (payload && payload.synced === true) {
@@ -80,13 +80,13 @@ function App() {
       dispatch(createAction(type)({ ...payload, synced: true }));
     });
     return () => bc.close();
-  }, [dispatch, setTab]);
+  }, [dispatch, setCurrentWindow]);
 
-  const EXIT_MULTI_TAB = "exit-multi-tab";
+  const EXIT_MULTI_WINDOW = "exit-multi-window";
   useEffect(() => {
     const onBeforeUnload = () => {
       const bc = new BroadcastChannel("state-sync");
-      bc.postMessage({ type: EXIT_MULTI_TAB });
+      bc.postMessage({ type: EXIT_MULTI_WINDOW });
     };
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
@@ -96,21 +96,21 @@ function App() {
     (event) => {
       event.preventDefault();
       setItemOverDropzone(false);
-      if (!tab || tab === "single") {
+      if (!currentWindow || currentWindow === "single") {
         return;
       }
       const id = event.dataTransfer.getData("text/plain");
-      if (!tabs[tab].includes(id)) {
+      if (!windows[currentWindow].includes(id)) {
         dispatch(
-          moveToTab({
+          moveToWindow({
             id,
-            targetTab: tab,
-            sourceTab: tab === "one" ? "two" : "one",
+            targetWindow: currentWindow,
+            sourceWindow: currentWindow === "one" ? "two" : "one",
           })
         );
       }
     },
-    [dispatch, tab, tabs]
+    [dispatch, currentWindow, windows]
   );
 
   const onDragOver = (event) => {
@@ -135,7 +135,7 @@ function App() {
       dropzone.removeEventListener("dragenter", onDragEnter);
       dropzone.removeEventListener("dragleave", onDragLeave);
     };
-  }, [dispatch, onCounterDrop, tab, tabs]);
+  }, [dispatch, onCounterDrop, currentWindow, windows]);
 
   return (
     <div className="App">
@@ -143,7 +143,7 @@ function App() {
         <button onClick={() => dispatch(decrementAll())}>-</button>
         <button onClick={onAddCounterClick}>Add counter</button>
         <button onClick={() => dispatch(incrementAll())}>+</button>
-        <button onClick={onOpenNewTabClick}>Open new tab</button>
+        <button onClick={onOpenNewWindowClick}>Open new window</button>
       </header>
       <main
         className={`App-main ${itemOverDropzone ? "dragover" : ""}`}
@@ -151,7 +151,9 @@ function App() {
       >
         {Object.entries(counters).map(
           ([id, value]) =>
-            tabs[tab].includes(id) && <Counter key={id} id={id} value={value} />
+            windows[currentWindow].includes(id) && (
+              <Counter key={id} id={id} value={value} />
+            )
         )}
         {itemOverDropzone && (
           <div className="dragover-text">Drop counter here</div>

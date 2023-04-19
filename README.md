@@ -1,7 +1,7 @@
-# Multi-tab React-Redux app demo with drag and drop
+# Multi-window React-Redux app demo with drag and drop
 
 The project uses BroadcastChannel API to allow Redux state and actions to be synced between tabs or windows. The middleware is a very basic implementation, following the same general principle of sending actions through the channel as [Redux-State-Sync](https://github.com/aohua/redux-state-sync).
-This demo also uses the BroadcastChannel messages to detect a tab being closed and adds drag and drop between tabs/windows.
+This demo also uses the BroadcastChannel messages to detect a window being closed and adds drag and drop between tabs/windows.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 

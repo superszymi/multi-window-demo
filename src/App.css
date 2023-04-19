@@ -29,6 +29,7 @@ body {
   position: relative;
   margin-top: 200px;
   height: calc(100% - 240px);
+  min-height: 480px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   row-gap: 10px;

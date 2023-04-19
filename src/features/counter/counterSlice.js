@@ -2,7 +2,7 @@ import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   counters: { 1: 0 },
-  tabs: {
+  windows: {
     single: ["1"],
     one: [],
     two: [],
@@ -15,11 +15,11 @@ export const counterSlice = createSlice({
   reducers: {
     addCounter: (state, action) => {
       state.counters = { ...state.counters, [action.payload.id]: 0 };
-      state.tabs = {
-        ...state.tabs,
-        single: [...state.tabs.single, action.payload.id.toString()],
-        [action.payload.tab]: [
-          ...state.tabs[action.payload.tab],
+      state.windows = {
+        ...state.windows,
+        single: [...state.windows.single, action.payload.id.toString()],
+        [action.payload.window]: [
+          ...state.windows[action.payload.window],
           action.payload.id.toString(),
         ],
       };
@@ -28,10 +28,10 @@ export const counterSlice = createSlice({
       state.counters = Object.keys(state.counters)
         .filter((counter) => counter !== action.payload.id)
         .reduce((obj, cur) => ({ ...obj, [cur]: state.counters[cur] }), {});
-      state.tabs = {
-        ...state.tabs,
-        single: state.tabs.single.filter((id) => id !== action.payload.id),
-        [action.payload.tab]: state.tabs[action.payload.tab].filter(
+      state.windows = {
+        ...state.windows,
+        single: state.windows.single.filter((id) => id !== action.payload.id),
+        [action.payload.window]: state.windows[action.payload.window].filter(
           (id) => id !== action.payload.id
         ),
       };
@@ -61,27 +61,27 @@ export const counterSlice = createSlice({
       );
     },
     spreadCounters: (state) => {
-      state.tabs = {
-        single: state.tabs.single,
-        one: state.tabs.single.filter((id) => id % 2 !== 0),
-        two: state.tabs.single.filter((id) => id % 2 === 0),
+      state.windows = {
+        single: state.windows.single,
+        one: state.windows.single.filter((id) => id % 2 !== 0),
+        two: state.windows.single.filter((id) => id % 2 === 0),
       };
     },
-    moveToTab: (state, action) => {
-      state.tabs = {
-        single: state.tabs.single,
-        [action.payload.sourceTab]: state.tabs[action.payload.sourceTab].filter(
-          (id) => id !== action.payload.id
-        ),
-        [action.payload.targetTab]: [
-          ...state.tabs[action.payload.targetTab],
+    moveToWindow: (state, action) => {
+      state.windows = {
+        single: state.windows.single,
+        [action.payload.sourceWindow]: state.windows[
+          action.payload.sourceWindow
+        ].filter((id) => id !== action.payload.id),
+        [action.payload.targetWindow]: [
+          ...state.windows[action.payload.targetWindow],
           action.payload.id,
         ],
       };
     },
     setInitState: (state, action) => {
       state.counters = action.payload.state.counters;
-      state.tabs = action.payload.state.tabs;
+      state.windows = action.payload.state.windows;
     },
   },
 });
@@ -94,13 +94,13 @@ export const {
   incrementAll,
   decrementAll,
   spreadCounters,
-  moveToTab,
+  moveToWindow,
   setInitState,
 } = counterSlice.actions;
 
 export const selectCounters = (state) => state.counter.counters;
 
-export const selectTabs = (state) => state.counter.tabs;
+export const selectWindows = (state) => state.counter.windows;
 
 export const selectFirstFreeId = createSelector(selectCounters, (counters) =>
   Object.keys(counters).length === 0

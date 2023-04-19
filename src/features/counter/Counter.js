@@ -5,12 +5,12 @@ import styles from "./Counter.module.css";
 
 const Counter = ({ id, value }) => {
   const dispatch = useDispatch();
-  const tab =
-    new URLSearchParams(window.location.search).get("tab") || "single";
+  const currentWindow =
+    new URLSearchParams(window.location.search).get("window") || "single";
   const ref = useRef(null);
 
   const onRemove = () => {
-    dispatch(removeCounter({ id, tab }));
+    dispatch(removeCounter({ id, window: currentWindow }));
   };
 
   const onDragStart = useCallback(
@@ -24,7 +24,7 @@ const Counter = ({ id, value }) => {
     const draggable = ref.current;
     draggable.addEventListener("dragstart", (event) => onDragStart(event));
     return () => draggable.removeEventListener("dragstart", onDragStart);
-  }, [onDragStart, tab]);
+  }, [onDragStart, currentWindow]);
 
   return (
     <div>

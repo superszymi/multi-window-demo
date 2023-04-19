@@ -125,10 +125,10 @@ function App() {
 
   useEffect(() => {
     const dropzone = ref.current;
-    dropzone.addEventListener("drop", (event) => onCounterDrop(event));
-    dropzone.addEventListener("dragover", (event) => onDragOver(event));
-    dropzone.addEventListener("dragenter", () => onDragEnter());
-    dropzone.addEventListener("dragleave", () => onDragLeave());
+    dropzone.addEventListener("drop", onCounterDrop);
+    dropzone.addEventListener("dragover", onDragOver);
+    dropzone.addEventListener("dragenter", onDragEnter);
+    dropzone.addEventListener("dragleave", onDragLeave);
     return () => {
       dropzone.removeEventListener("drop", onCounterDrop);
       dropzone.removeEventListener("dragover", onDragOver);
